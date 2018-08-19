@@ -1,12 +1,11 @@
-require "prekol"
-local slides
+local diagram
 
 function setup()
 	size(640,480)
 	background(255)
-	slides = assert(loadfile("example1.lua"))
+	diagram = assert(loadfile("example1.lua"))
 end
 
 function draw()
-	slides()
+	diagram()
 end
