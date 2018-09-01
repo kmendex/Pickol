@@ -1,5 +1,6 @@
 require "pickol"
 
+pic.PS(200)
 pic.ellipse("document")
 pic.arrow()
 pic.box("PIC")
