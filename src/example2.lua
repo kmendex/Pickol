@@ -1,0 +1,15 @@
+require "pickol"
+
+pic.PS(150)
+pic.box({"box"})
+pic.move()
+pic.line({"line"},true)
+pic.move()
+pic.arrow({"arrow"})
+pic.move()
+pic.circle({"circle"})
+pic.move()
+pic.ellipse({"ellipse"})
+pic.move()
+pic.arc({"arc"})
+pic.PE()
