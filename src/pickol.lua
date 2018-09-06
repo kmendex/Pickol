@@ -1,6 +1,8 @@
 local indX,indY = 10,10	-- posicion X y posicion Y
+local indXR,indYR = width()-10,height()-10
 local defaultWid = 100	-- ancho por defecto
 local defaultHt			-- alto por defecto
+local drawLeft,drawDown,drawRight,drawUp = true,false,false,false
 
 -------------built-in variables-----------------------------------------
 local boxwid, boxht
@@ -19,6 +21,7 @@ textFont(f)
 pic = pic or {}
 
 pic.PS= function(opt_width,opt_height)
+	param(...)
 	defaultWid = opt_width or defaultWid	-- ancho distinto
 	defaultHt = opt_height or defaultWid	-- alto distinto o escala 1:1 con el ancho
 	-- valores proporcionales
@@ -31,7 +34,8 @@ pic.PS= function(opt_width,opt_height)
 	arrowwid, arrowht = defaultWid * 0.1, defaultHt * 0.05
 end
 
-pic.box = function(txt,dashed)
+pic.box = function(...)
+	param(...)
 	local txt = txt or {}
 	local boxwid = boxwid -- or tamaño en parametro
 	local boxht = boxht
@@ -40,12 +44,10 @@ pic.box = function(txt,dashed)
 		local tamx, tamy = boxwid/4, boxht/4		
 		for x = indX, indX+boxwid-1, tamx*2 do
 			line(x,indY,x+tamx,indY)
---			line(x,indY+boxht,x+tamx,indY+boxht)
 			line(x+tamx,indY+boxht,x,indY+boxht)
 		end 
 		for y = indY, indY+boxht-1, tamy*2 do
 			line(indX,y,indX,y+tamy)
---			line(indX+boxwid,y,indX+boxwid,y+tamy)
 			line(indX+boxwid,y+tamy,indX+boxwid,y)
 		end 
 		endShape()
@@ -61,14 +63,16 @@ pic.box = function(txt,dashed)
 	indX=indX+boxwid
 end
 
-pic.circle = function(txt)
+pic.circle = function(...)
+	param(...)
 	local txt = txt or {}
 	local circlerad = circlerad
 	pic.ellipse(txt,circlerad,circlerad)
 end
 
 
-pic.ellipse = function(txt,w,h)
+pic.ellipse = function(...)
+	param(...)
 	local txt = txt or {}
 	local ellipsewid = w or ellipsewid
 	local ellipseht = h or ellipseht
@@ -82,7 +86,8 @@ pic.ellipse = function(txt,w,h)
 	indX=indX+ellipsewid
 end
 
-pic.arc = function(txt)
+pic.arc = function(...)
+	param(...)
 	local txt = txt or {}
 	local arcrad = arcrad
 	arc(indX,indY+25,arcrad,arcrad,0,PI/2)
@@ -95,7 +100,8 @@ pic.arc = function(txt)
 	indX=indX+arcrad
 end
 
-pic.line = function(txt,dashed)
+pic.line = function(...)
+	param(...)
 	local txt = txt or {}
 	local linewid = linewid
 	local lineht = lineht
@@ -118,7 +124,8 @@ pic.line = function(txt,dashed)
 	indX=indX+linewid
 end
 
-pic.arrow = function(txt)
+pic.arrow = function(...)
+	param(...)
 	local txt = txt or {}
 	local arrowwid = arrowwid
 	local arrowht = arrowht
@@ -132,17 +139,54 @@ end
 	
 end]]
 
-pic.move = function(w,h)
+pic.move = function(...)
+	param(...)
 	local movewid = w or movewid
 	local moveht = h or moveht
 	indX=indX+movewid
 end
 
---[[pic.text_list = function()
-	
-end]]
+pic.left = function()
+	drawLeft,drawDown,drawRight,drawUp = true,false,false,false
+end
+
+pic.up = function()
+	drawLeft,drawDown,drawRight,drawUp = false,false,false,true
+end
+
+pic.down = function()
+	drawLeft,drawDown,drawRight,drawUp = false,true,false,false
+end
+
+pic.right = function()
+	drawLeft,drawDown,drawRight,drawUp = false,false,true,false
+end
+
+pic.reset = function()
+
+end
 
 pic.PE = function()
 	indX,indY=10,10
 	noFill()
 end
+
+function param(...)
+	local listParam={text={},
+		dash=0,
+		wid=0,
+		ht=0,
+		dotted=0,
+		invis=false,
+		fill=0,
+		up=0,
+		down=0,
+		left=0,
+		right=0,
+		cw=false,
+		rad=0,
+		diameter=0
+		}
+	return listParam
+end
+
