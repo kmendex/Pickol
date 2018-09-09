@@ -1,8 +1,8 @@
 local indX,indY = 10,10	-- posicion X y posicion Y
---local indXR,indYR = width()-10,height()-10
+local indXR,indYR = width()-10,height()-10
 local defaultWid = 100	-- ancho por defecto
 local defaultHt			-- alto por defecto
-local drawLeft,drawDown,drawRight,drawUp = true,false,false,false
+local drawRight,drawDown,drawLeft,drawUp = true,false,false,false
 
 -------------built-in variables-----------------------------------------
 local boxwid, boxht
@@ -37,33 +37,44 @@ pic.box = function(args)
 	local txt = args.text or {}
 	local boxwid = args.width or args.wid or boxwid -- or tamaño en parametro
 	local boxht = args.height or args.ht or boxht
+	local xBox,yBox = indX,indY
+	
+	if drawLeft then 
+		xBox=indXR-boxwid
+		indX=xBox
+	elseif drawUp then
+		yBox=indYR-boxht
+		indY=yBox
+	end
+
 	if dashed then
 		beginShape(LINES)
 		local tamx, tamy = boxwid/4, boxht/4		
-		for x = indX, indX+boxwid-1, tamx*2 do
-			line(x,indY,x+tamx,indY)
+		for x = xBox, xBox+boxwid-1, tamx*2 do
+			line(x,yBox,x+tamx,yBox)
 --			line(x,indY+boxht,x+tamx,indY+boxht)
-			line(x+tamx,indY+boxht,x,indY+boxht)
+			line(x+tamx,yBox+boxht,x,yBox+boxht)
 		end 
-		for y = indY, indY+boxht-1, tamy*2 do
-			line(indX,y,indX,y+tamy)
+		for y = yBox, yBox+boxht-1, tamy*2 do
+			line(xBox,y,xBox,y+tamy)
 --			line(indX+boxwid,y,indX+boxwid,y+tamy)
-			line(indX+boxwid,y+tamy,indX+boxwid,y)
+			line(xBox+boxwid,y+tamy,yBox+boxwid,y)
 		end 
 		endShape()
 	else
-		rect(indX,indY,boxwid,boxht) 
+		rect(xBox,yBox,boxwid,boxht) 
 	end
-	local posTxt = indY+boxht/2-(#txt/2-1)*sizFont
+	local posTxt = yBox+boxht/2-(#txt/2-1)*sizFont
 	fill(0)
 	for ind,val in pairs(txt) do
-		text(txt[ind],indX+boxwid/6,posTxt+(ind-1)*sizFont)
+		text(txt[ind],xBox+boxwid/6,posTxt+(ind-1)*sizFont)
 	end
 	noFill()
-	if drawLeft then
-		indX=indX+boxwid
-	elseif drawDown then
+
+	if drawDown then 	
 		indY=indY+boxht
+	else
+		indX=indX+boxwid
 	end
 end
 
@@ -77,24 +88,42 @@ end
 pic.ellipse = function(args)
 	local txt = args.text or {}
 	local ellipsewid = args.width or args.wid or ellipsewid
-	local ellipseht = args.height or args.ht or ellipseht
-	ellipse(indX+ellipsewid/2,indY+ellipseht/2,ellipsewid,ellipseht)
-	local posTxt = indY+ellipseht/2-(#txt/2-1)*sizFont
+	local ellipseht = args.height or args.ht or ellipseht	
+	local xEllipse,yEllipse = indX,indY
+	
+	if drawLeft then
+		xEllipse=indXR-ellipsewid
+		indX=xEllipse
+	elseif drawUp then
+		yEllipse=indYR-ellipseht
+		indY=yEllipse
+	end
+	
+	ellipse(xEllipse+ellipsewid/2,yEllipse+ellipseht/2,ellipsewid,ellipseht)
+	local posTxt = yEllipse+ellipseht/2-(#txt/2-1)*sizFont
 	fill(0)
 	for ind,val in pairs(txt) do
-		text(txt[ind],indX+ellipsewid/6,posTxt+(ind-1)*sizFont)
+		text(txt[ind],xEllipse+ellipsewid/6,posTxt+(ind-1)*sizFont)
 	end
 	noFill()
-	if drawLeft then
-		indX=indX+ellipsewid
-	elseif drawDown then
+
+	if drawDown then
 		indY=indY+ellipseht
+	else
+		indX=indX+ellipsewid
 	end
 end
 
 pic.arc = function(args)
 	local txt = args.text or {}
 	local arcrad = args.radius or args.rad or arcrad --args.diameter/2 or args.diam/2 or args.radius or args.rad or arcrad
+	local x,y = indX,indY
+	
+	if drawDown then	
+	elseif drawRight then
+	elseif drawUp then
+	else
+	end
 	arc(indX,indY+25,arcrad,arcrad,0,PI/2)
 	local posTxt = indY+arcrad/2-(#txt/2-1)*sizFont
 	fill(0)
@@ -109,30 +138,41 @@ pic.arc = function(args)
 	end	
 end
 
+-- Revisar
 pic.line = function(args)
 	local txt = args.text or {}
 	local linewid = linewid
 	local lineht = lineht
+	local xLine,yLine = indX,indY
+	
+	if drawLeft then
+		xLine=indXR-linewid
+		indX=xLine
+	elseif drawUp then
+		yLine=indYR-lineht
+		indXR=yLine
+	end
 	if dashed then
 		beginShape(LINES)
 		local tamx= boxwid/4		
-		for x = indX, indX+linewid-1, tamx*2 do
-			line(x,indY+lineht/2,x+tamx,indY+lineht/2)
+		for x = xLine, xLine+linewid-1, tamx*2 do
+			line(x,yLine+lineht/2,x+tamx,yLine+lineht/2)
 		end 
 		endShape()
 	else
-		line(indX,indY+lineht/2,indX+linewid,indY+lineht/2)		
+		line(xLine,yLine+lineht/2,xLine+linewid,yLine+lineht/2)		
 	end
-	local posTxt = indY+lineht/2-(#txt/2-1)*sizFont
+	local posTxt = yLine+lineht/2-(#txt/2-1)*sizFont
 	fill(0)
 	for ind,val in pairs(txt) do
-		text(txt[ind],indX+linewid/6,posTxt+(ind-1)*sizFont)
+		text(txt[ind],xLine+linewid/6,posTxt+(ind-1)*sizFont)
 	end
 	noFill()
-	if drawLeft then	
-		indX=indX+linewid
-	elseif drawDown then
+	
+	if drawDown then
 		indY=indY+lineht
+	else
+		indX=indX+linewid
 	end
 end
 
@@ -140,9 +180,36 @@ pic.arrow = function(args)
 	local txt = args.text or {}
 	local arrowwid = arrowwid
 	local arrowht = arrowht
+	local xArrowH,yArrowH
+	local xHead,yHead,x1Head,y1Head
+
 	pic.line{text=txt}
-	line(indX-arrowwid,indY+lineht/2-arrowht,indX,indY+lineht/2)
-	line(indX-arrowwid,indY+lineht/2+arrowht,indX,indY+lineht/2)
+	if drawDown then
+		xArrowH=indX+linewid/2
+		yArrowH=indY
+		xHead = xArrowH+linewid/2-arrowwid
+		x1Head = xArrowH+linewid/2+arrowwid
+		yHead = (yArrowH-arrowht)
+		y1Head = yHead
+	--[[elseif drawLeft then
+		
+	elseif drawUp then		
+]]
+	else
+		xArrowH=indX
+		yArrowH=indY+lineht/2
+		xHead = xArrowH-arrowwid
+		x1Head = xHead
+		yHead = yArrow+lineht/2-arrowht
+		y1Head = yArrow+lineht/2+arrowht
+	end
+
+	--line(indX-arrowwid,indY+lineht/2-arrowht,indX,indY+lineht/2)
+	--line(indX-arrowwid,indY+lineht/2+arrowht,indX,indY+lineht/2)
+	--line(xArrowH-arrowwid,yArrowH+lineht/2-arrowht,xArrowH,yArrowH+lineht/2)
+	--line(xArrowH-arrowwid,yArrowH+lineht/2+arrowht,xArrowH,yArrowH+lineht/2)
+	line(xArrowH,yArrowH,xHead,yHead)
+	line(xArrowH,yArrowH,x1Head,y1Head)
 	noFill()
 end
 
@@ -153,6 +220,13 @@ end]]
 pic.move = function(args)
 	local movewid = w or movewid
 	local moveht = h or moveht
+	local x,y = indX,indY
+	
+	if drawDown then	
+	elseif drawRight then
+	elseif drawUp then
+	else
+	end
 	if drawLeft then	
 		indX=indX+movewid
 	elseif drawDown then
@@ -165,19 +239,23 @@ end
 end]]
 
 pic.left = function()
-	drawLeft,drawDown,drawRight,drawUp = true,false,false,false
+	drawLeft = true
+	drawRight, drawDown, drawUp = false,false,false
 end
 
 pic.up = function()
-	drawLeft,drawDown,drawRight,drawUp = false,false,false,true
+	drawUp = true
+	drawRight, drawDown, drawLeft = false,false,false
 end
 
 pic.down = function()
-	drawLeft,drawDown,drawRight,drawUp = false,true,false,false
+	drawDown = true
+	drawRight, drawLeft, drawUp = false,false,false
 end
 
 pic.right = function()
-	drawLeft,drawDown,drawRight,drawUp = false,false,true,false
+	drawRight = true
+	drawDown, drawLeft, drawUp = false,false,false
 end
 
 pic.reset = function()
