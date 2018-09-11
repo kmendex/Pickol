@@ -138,29 +138,48 @@ pic.arc = function(args)
 	end	
 end
 
--- Revisar
 pic.line = function(args)
 	local txt = args.text or {}
 	local linewid = linewid
 	local lineht = lineht
 	local xLine,yLine = indX,indY
-	
+	local xLine1,yLine1
+
 	if drawLeft then
+		xLine1=indXR
 		xLine=indXR-linewid
-		indX=xLine
+		indXR=xLine
+		yLine=yLine+lineht/2
+		yLine1=yLine
 	elseif drawUp then
+		yLine1=indYR
 		yLine=indYR-lineht
-		indXR=yLine
+		indYR=yLine
+		xLine=xLine+linewid/2
+		xLine1=xLine
+	elseif drawDown then
+		yLine1=indY
+		indY=indY+lineht
+		yLine=indY
+		xLine=xLine+linewid/2
+		xLine1=xLine
+	else
+		xLine1=indX
+		indX=indX+linewid
+		xLine=indX
+		yLine=yLine+lineht/2
+		yLine1=yLine
 	end
+
 	if dashed then
 		beginShape(LINES)
-		local tamx= boxwid/4		
+		local tamx= linewid/4		
 		for x = xLine, xLine+linewid-1, tamx*2 do
-			line(x,yLine+lineht/2,x+tamx,yLine+lineht/2)
+			line(x,yLine,x+tamx,yLine)
 		end 
 		endShape()
 	else
-		line(xLine,yLine+lineht/2,xLine+linewid,yLine+lineht/2)		
+		line(xLine,yLine,xLine1,yLine1)		
 	end
 	local posTxt = yLine+lineht/2-(#txt/2-1)*sizFont
 	fill(0)
@@ -168,12 +187,6 @@ pic.line = function(args)
 		text(txt[ind],xLine+linewid/6,posTxt+(ind-1)*sizFont)
 	end
 	noFill()
-	
-	if drawDown then
-		indY=indY+lineht
-	else
-		indX=indX+linewid
-	end
 end
 
 pic.arrow = function(args)
@@ -187,21 +200,31 @@ pic.arrow = function(args)
 	if drawDown then
 		xArrowH=indX+linewid/2
 		yArrowH=indY
-		xHead = xArrowH+linewid/2-arrowwid
-		x1Head = xArrowH+linewid/2+arrowwid
-		yHead = (yArrowH-arrowht)
+		xHead = xArrowH-arrowht
+		x1Head = xArrowH+arrowht
+		yHead = yArrowH-arrowwid
 		y1Head = yHead
-	--[[elseif drawLeft then
-		
+	elseif drawLeft then
+		xArrowH=indXR
+		yArrowH=indYR+lineht/2
+		xHead = xArrowH-arrowwid
+		x1Head = xHead
+		yHead = yArrow-arrowht
+		y1Head = yArrow+arrowht	
 	elseif drawUp then		
-]]
+		xArrowH=indXR+linewid/2
+		yArrowH=indYR
+		xHead = xArrowH-arrowht
+		x1Head = xArrowH+arrowht
+		yHead = yArrowH-arrowwid
+		y1Head = yHead
 	else
 		xArrowH=indX
 		yArrowH=indY+lineht/2
 		xHead = xArrowH-arrowwid
 		x1Head = xHead
-		yHead = yArrow+lineht/2-arrowht
-		y1Head = yArrow+lineht/2+arrowht
+		yHead = yArrowH-arrowht
+		y1Head = yArrowH+arrowht
 	end
 
 	--line(indX-arrowwid,indY+lineht/2-arrowht,indX,indY+lineht/2)
