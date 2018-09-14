@@ -3,6 +3,7 @@ local indXR,indYR = width()-10,height()-10
 local defaultWid = 100	-- ancho por defecto
 local defaultHt			-- alto por defecto
 local drawRight,drawDown,drawLeft,drawUp = true,false,false,false
+local tags	-- almacena las coordenadas donde se coloco la figura asociada
 
 -------------built-in variables-----------------------------------------
 local boxwid, boxht
@@ -35,34 +36,39 @@ end
 
 pic.box = function(args)
 	local txt = args.text or {}
-	local boxwid = args.width or args.wid or boxwid -- or tamaño en parametro
-	local boxht = args.height or args.ht or boxht
+	local boxwidP = args.width or args.wid or 1
+	local boxwid = boxwidP*boxwid
+	local boxhtP = args.height or args.ht or 1
+	local boxht = boxhtP*boxht
 	local xBox,yBox = indX,indY
+	local invis = args.invis or false
 	
 	if drawLeft then 
 		xBox=indXR-boxwid
-		indX=xBox
+		indXR=xBox
 	elseif drawUp then
 		yBox=indYR-boxht
-		indY=yBox
+		indYR=yBox
 	end
 
-	if dashed then
-		beginShape(LINES)
-		local tamx, tamy = boxwid/4, boxht/4		
-		for x = xBox, xBox+boxwid-1, tamx*2 do
-			line(x,yBox,x+tamx,yBox)
---			line(x,indY+boxht,x+tamx,indY+boxht)
-			line(x+tamx,yBox+boxht,x,yBox+boxht)
-		end 
-		for y = yBox, yBox+boxht-1, tamy*2 do
-			line(xBox,y,xBox,y+tamy)
---			line(indX+boxwid,y,indX+boxwid,y+tamy)
-			line(xBox+boxwid,y+tamy,yBox+boxwid,y)
-		end 
-		endShape()
-	else
-		rect(xBox,yBox,boxwid,boxht) 
+	if not invis then 
+		if dashed then
+			beginShape(LINES)
+			local tamx, tamy = boxwid/4, boxht/4		
+			for x = xBox, xBox+boxwid-1, tamx*2 do
+				line(x,yBox,x+tamx,yBox)
+	--			line(x,indY+boxht,x+tamx,indY+boxht)
+				line(x+tamx,yBox+boxht,x,yBox+boxht)
+			end 
+			for y = yBox, yBox+boxht-1, tamy*2 do
+				line(xBox,y,xBox,y+tamy)
+	--			line(indX+boxwid,y,indX+boxwid,y+tamy)
+				line(xBox+boxwid,y+tamy,yBox+boxwid,y)
+			end 
+			endShape()
+		else
+			rect(xBox,yBox,boxwid,boxht) 
+		end
 	end
 	local posTxt = yBox+boxht/2-(#txt/2-1)*sizFont
 	fill(0)
@@ -73,33 +79,38 @@ pic.box = function(args)
 
 	if drawDown then 	
 		indY=indY+boxht
-	else
+	elseif drawRight then
 		indX=indX+boxwid
 	end
 end
 
 pic.circle = function(args)
 	local txt = args.text or {}
-	local circlerad = args.radius or args.rad or circlerad --args.diameter/2 or args.diam/2 or args.radius or args.rad or circlerad
-	pic.ellipse{text=txt,wid=circlerad,ht=circlerad}
+	local circlerad = args.radius or args.rad or 1	--args.diameter/2 or args.diam/2 or args.radius or args.rad or circlerad
+	local invis = args.invis or false
+	pic.ellipse{text=txt,wid=circlerad,ht=circlerad,invis=invis}
 end
 
 
 pic.ellipse = function(args)
 	local txt = args.text or {}
-	local ellipsewid = args.width or args.wid or ellipsewid
-	local ellipseht = args.height or args.ht or ellipseht	
+	local ellipsewidP = args.width or args.wid or 1
+	local ellipsewid = ellipsewidP*ellipsewid
+	local ellipsehtP = args.height or args.ht or 1
+	local ellipseht = ellipsehtP*ellipseht
 	local xEllipse,yEllipse = indX,indY
+	local invis = args.invis or false
 	
 	if drawLeft then
 		xEllipse=indXR-ellipsewid
-		indX=xEllipse
+		indXR=xEllipse
 	elseif drawUp then
 		yEllipse=indYR-ellipseht
-		indY=yEllipse
+		indYR=yEllipse
 	end
-	
-	ellipse(xEllipse+ellipsewid/2,yEllipse+ellipseht/2,ellipsewid,ellipseht)
+	if not invis then 
+		ellipse(xEllipse+ellipsewid/2,yEllipse+ellipseht/2,ellipsewid,ellipseht)
+	end
 	local posTxt = yEllipse+ellipseht/2-(#txt/2-1)*sizFont
 	fill(0)
 	for ind,val in pairs(txt) do
@@ -109,7 +120,7 @@ pic.ellipse = function(args)
 
 	if drawDown then
 		indY=indY+ellipseht
-	else
+	elseif drawRight then
 		indX=indX+ellipsewid
 	end
 end
@@ -118,13 +129,16 @@ pic.arc = function(args)
 	local txt = args.text or {}
 	local arcrad = args.radius or args.rad or arcrad --args.diameter/2 or args.diam/2 or args.radius or args.rad or arcrad
 	local x,y = indX,indY
+	local invis = args.invis or false
 	
 	if drawDown then	
 	elseif drawRight then
 	elseif drawUp then
 	else
 	end
-	arc(indX,indY+25,arcrad,arcrad,0,PI/2)
+	if not invis then 
+		arc(indX,indY+25,arcrad,arcrad,0,PI/2)
+	end
 	local posTxt = indY+arcrad/2-(#txt/2-1)*sizFont
 	fill(0)
 	for ind,val in pairs(txt) do
@@ -144,6 +158,7 @@ pic.line = function(args)
 	local lineht = lineht
 	local xLine,yLine = indX,indY
 	local xLine1,yLine1
+	local invis = args.invis or false
 
 	if drawLeft then
 		xLine1=indXR
@@ -171,15 +186,17 @@ pic.line = function(args)
 		yLine1=yLine
 	end
 
-	if dashed then
-		beginShape(LINES)
-		local tamx= linewid/4		
-		for x = xLine, xLine+linewid-1, tamx*2 do
-			line(x,yLine,x+tamx,yLine)
-		end 
-		endShape()
-	else
-		line(xLine,yLine,xLine1,yLine1)		
+	if not invis then 
+		if dashed then
+			beginShape(LINES)
+			local tamx= linewid/4		
+			for x = xLine, xLine+linewid-1, tamx*2 do
+				line(x,yLine,x+tamx,yLine)
+			end 
+			endShape()
+		else
+			line(xLine,yLine,xLine1,yLine1)			
+		end
 	end
 	local posTxt = yLine+lineht/2-(#txt/2-1)*sizFont
 	fill(0)
@@ -195,6 +212,7 @@ pic.arrow = function(args)
 	local arrowht = arrowht
 	local xArrowH,yArrowH
 	local xHead,yHead,x1Head,y1Head
+	local invis = args.invis or false
 
 	pic.line{text=txt}
 	if drawDown then
@@ -207,16 +225,16 @@ pic.arrow = function(args)
 	elseif drawLeft then
 		xArrowH=indXR
 		yArrowH=indYR+lineht/2
-		xHead = xArrowH-arrowwid
+		xHead = xArrowH+arrowwid
 		x1Head = xHead
-		yHead = yArrow-arrowht
-		y1Head = yArrow+arrowht	
+		yHead = yArrowH-arrowht
+		y1Head = yArrowH+arrowht	
 	elseif drawUp then		
 		xArrowH=indXR+linewid/2
 		yArrowH=indYR
 		xHead = xArrowH-arrowht
 		x1Head = xArrowH+arrowht
-		yHead = yArrowH-arrowwid
+		yHead = yArrowH+arrowwid
 		y1Head = yHead
 	else
 		xArrowH=indX
@@ -231,8 +249,10 @@ pic.arrow = function(args)
 	--line(indX-arrowwid,indY+lineht/2+arrowht,indX,indY+lineht/2)
 	--line(xArrowH-arrowwid,yArrowH+lineht/2-arrowht,xArrowH,yArrowH+lineht/2)
 	--line(xArrowH-arrowwid,yArrowH+lineht/2+arrowht,xArrowH,yArrowH+lineht/2)
-	line(xArrowH,yArrowH,xHead,yHead)
-	line(xArrowH,yArrowH,x1Head,y1Head)
+	if not invis then 
+		line(xArrowH,yArrowH,xHead,yHead)
+		line(xArrowH,yArrowH,x1Head,y1Head)
+	end
 	noFill()
 end
 
@@ -287,6 +307,7 @@ end
 
 pic.PE = function()
 	indX,indY=10,10
+	indXR,indYR = width()-10,height()-10
 	noFill()
 end
 
